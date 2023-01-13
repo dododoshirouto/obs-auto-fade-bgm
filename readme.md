@@ -19,7 +19,7 @@ OBS で配信するときに、BGM をループ再生し、シーンを変えた
 ## Installation
 
 1. シーンにブラウザソースを追加する
-2. URL を打ち込む。 `...URL...`
+2. URL を打ち込む。 (https://dododoshirouto.github.io/obs-auto-fade-bgm/)
 3. 音声を OBS に取り込む
 4. ページへのアクセス権限を設定する
 
