@@ -120,7 +120,7 @@ function getScenes() {
     obsstudio.getScenes((scenes) => {
         OBS_SCENES = scenes;
 
-        debug_view.innerText = JSON.stringify(SCENE_BGM_SWITCH);
+        // debug_view.innerText = JSON.stringify(SCENE_BGM_SWITCH);
 
         [...document.getElementsByClassName('scene_switch')].map((elem) => {
             if (scenes.indexOf(elem.innerText) == -1) elem.remove();
