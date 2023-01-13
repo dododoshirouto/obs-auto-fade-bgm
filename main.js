@@ -10,10 +10,11 @@ var BGM_FADE = {
     FADE_OUT: 2,
     PLAY: 3,
     PAUSE: 4,
-}
+};
 var BGM_FADE_STATUS = BGM_FADE.EMPTY;
 var BGM_FADE_START_TIME = -1;
 
+/** @type {{scene:bool}} */
 var SCENE_BGM_SWITCH = {};
 
 var DELTA_TIME = 0;
@@ -36,7 +37,11 @@ function init() {
         return;
     }
 
-    obsstudio.getControlLevel(level => APP_POWER = (level >= 2));
+    (query.scenes ?? '').split(',').map((v) => {
+        if (v) SCENE_BGM_SWITCH[decodeURIComponent(v)] = true;
+    });
+
+    obsstudio.getControlLevel((level) => (APP_POWER = level >= 2));
 
     update();
 }
@@ -47,12 +52,11 @@ function update() {
 
     if (Date.now() - OBS_SCENES_LAST_LOADTIME > 1000) getScenes();
 
-
-    obsstudio.getCurrentScene(scene => {
+    obsstudio.getCurrentScene((scene) => {
         if (scene.name != OBS_CURRENT_SCENE) {
             console.log(scene.name);
             console.log(SCENE_BGM_SWITCH[scene.name]);
-            if ((BGM_FADE_STATUS != BGM_FADE.FADE_IN && BGM_FADE_STATUS != BGM_FADE.PLAY) && (scene.name in SCENE_BGM_SWITCH && SCENE_BGM_SWITCH[scene.name])) {
+            if (BGM_FADE_STATUS != BGM_FADE.FADE_IN && BGM_FADE_STATUS != BGM_FADE.PLAY && scene.name in SCENE_BGM_SWITCH && SCENE_BGM_SWITCH[scene.name]) {
                 // BGM start.
                 console.log('BGM start.');
                 BGM_FADE_START_TIME = Date.now();
@@ -113,30 +117,31 @@ function update() {
 
 /** たまに監視して更新したほうがいいかも。 */
 function getScenes() {
-    obsstudio.getScenes(scenes => {
+    obsstudio.getScenes((scenes) => {
         OBS_SCENES = scenes;
 
-        [...document.getElementsByClassName('scene_switch')].map(elem => {
+        debug_view.innerText = JSON.stringify(SCENE_BGM_SWITCH);
+
+        [...document.getElementsByClassName('scene_switch')].map((elem) => {
             if (scenes.indexOf(elem.innerText) == -1) elem.remove();
         });
 
-        scenes.map(scene => {
-            if (scene_switch_list.querySelector('#scene_switch_'+scene.easyHash())) return;
+        scenes.map((scene) => {
+            if (scene_switch_list.querySelector('#scene_switch_' + scene.easyHash())) return;
 
             let elem = document.createElement('p');
             elem.innerHTML = `<label><input type="checkbox" id="scene_switch_${scene.easyHash()}">${scene}</label>`;
             elem.classList.add('scene_switch');
             scene_switch_list.appendChild(elem);
 
-            elem.querySelector('input').addEventListener('change', ev => {
+            elem.querySelector('input').checked = SCENE_BGM_SWITCH[scene] ?? false;
+            elem.querySelector('input').addEventListener('change', (ev) => {
                 SCENE_BGM_SWITCH[scene] = ev.target.checked;
             });
-        })
+        });
     });
     OBS_SCENES_LAST_LOADTIME = Date.now();
 }
-
-
 
 /** @param {Event} */
 function setAudioFile(ev) {
@@ -147,12 +152,12 @@ function setAudioFile(ev) {
 }
 bgm_file.addEventListener('change', setAudioFile);
 
-bgm_player.addEventListener('playing', ev=>{
+bgm_player.addEventListener('playing', (ev) => {
     if (BGM_FADE_STATUS != BGM_FADE.FADE_IN) {
         bgm_player.volume = 1.0;
         BGM_FADE_STATUS = BGM_FADE.PLAY;
     }
 });
-bgm_player.addEventListener('pause', ev=>{
+bgm_player.addEventListener('pause', (ev) => {
     BGM_FADE_STATUS = BGM_FADE.PAUSE;
 });
