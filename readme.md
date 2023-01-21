@@ -36,6 +36,12 @@ OBS で配信するときに、BGM をループ再生し、シーンを変えた
 URL の仕様上、シーン名に「#」「?」「&」を含めることはできません。
 空白などは含まれていても大丈夫です。
 
+`?fadetime=[ミリ秒数]`
+フェードの時間を指定できます
+
+`?fadein=[true|false]`
+フェードインをするかどうかを指定できます
+
 ## Author
 
 -   Author: [どどど素人](https://www.twitter.com/super_amateur_c)

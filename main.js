@@ -32,14 +32,18 @@ var set_fade_time_ms = document.getElementById('set_fade_time_ms');
 var scene_switch_list = document.getElementById('scene_switch_list');
 
 function init() {
+    (query.scenes ?? '').split(',').map((v) => {
+        if (v) SCENE_BGM_SWITCH[decodeURIComponent(v)] = true;
+    });
+
+    set_fade_time_ms.value = query.fadetime ?? 500;
+
+    set_not_fade_in.checked = (query.fadein ?? 'false').trim().toUpperCase() == 'TRUE';
+
     if (typeof obsstudio != 'object') {
         APP_POWER = false;
         return;
     }
-
-    (query.scenes ?? '').split(',').map((v) => {
-        if (v) SCENE_BGM_SWITCH[decodeURIComponent(v)] = true;
-    });
 
     obsstudio.getControlLevel((level) => (APP_POWER = level >= 2));
 
